@@ -50,15 +50,15 @@ Todos os métodos devem ser implementados **sem o uso de bibliotecas estatístic
 ## 🧑‍🤝‍🧑 Identificação da Equipe  
 > ⚠️ **Esta seção deve ser obrigatoriamente preenchida pelos estudantes**
 
-### Nome do Grupo: [SUBSTITUA AQUI PELO NOME DO GRUPO]
+### Nome do Grupo: ITABUNA
 
 
 ### Integrantes da Equipe
 
-[Nome do Integrante 1]
+Gabriel da Silva e Siva
 
-[Nome do Integrante 2]
+Andrey Mota de Oliveira
 
-[Nome do Integrante 3]
+Claudio dos Santos Junior
 
-[Nome do Integrante 4]
+Louise de Souza Santino
