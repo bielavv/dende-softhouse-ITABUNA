@@ -55,10 +55,10 @@ Todos os métodos devem ser implementados **sem o uso de bibliotecas estatístic
 
 ### Integrantes da Equipe
 
-Gabriel da Silva e Siva
+Gabriel da Silva e Silva
 
 Andrey Mota de Oliveira
 
-Claudio dos Santos Junior
+Cláudio dos Santos Júnior
 
 Louise de Souza Santino
