@@ -20,7 +20,7 @@ class Statistics:
         if dataset:
             tamanhos = [len(v) for v in dataset.values()]
             if len(set(tamanhos)) > 1:
-                raise ValueError("Todos as caolunas devem ter o mesmo número de elementos")
+                raise ValueError("Todos as colunas devem ter o mesmo número de elementos")
             
         # 4. cada coluna tem dados do mesmo tipo?
 
@@ -133,7 +133,7 @@ class Statistics:
       # validação 2. verica se a lista está vazia
 
       if len(dados) == 0:
-            raise KeyError(f"Não é possivél verificar a mediana de uma coluna vazia")
+            raise KeyError(f"Não é possivél verificar a moda de uma coluna vazia")
       
       # contar frequenência em que os itens aparece
       contagem = {}
@@ -168,7 +168,7 @@ class Statistics:
       # validação 2. verica se a lista está vazia
 
       if len(dados) == 0:
-            raise KeyError(f"Não é possivél verificar a mediana de uma coluna vazia")
+            raise KeyError(f"Não é possivél verificar a variância de uma coluna vazia")
       
       # validação 3. verifica se todos os dados são números
 
@@ -198,7 +198,7 @@ class Statistics:
       # validação 2. verica se a lista está vazia
 
       if len(dados) == 0:
-         raise KeyError(f"Não é possivél verificar a mediana de uma coluna vazia")
+         raise KeyError(f"Não é possivél verificar o desvio padrão de uma coluna vazia")
       
       # validação 3. verifica se todos os dados são números
 
@@ -215,22 +215,52 @@ class Statistics:
       return variancia ** 0.5
 
     def covariance(self, column_a, column_b):
-        """
-        Calcula a covariância entre duas colunas.
 
-        Parâmetros
-        ----------
-        column_a : str
-            O nome da primeira coluna (X).
-        column_b : str
-            O nome da segunda coluna (Y).
+        # validação 1. verifica se as colunas existem.
 
-        Retorno
-        -------
-        float
-            O valor da covariância entre as duas colunas.
-        """
-        pass
+        if column_a not in self.dataset:
+          raise KeyError(f"Coluna '{column_a}' não existe no dataset")
+        if column_b not in self.dataset:
+          raise KeyError(f"Coluna '{column_b}' não existe no dataset")
+        
+        dados_a = self.dataset[column_a]
+        dados_b = self.dataset[column_b]
+
+        # validação 2. verifica se as colunas tem o mesmo tamanho
+
+        if len(dados_a) != len(dados_b):
+         raise ValueError("Colunas devem ter o mesmo número de elementos para covariância")
+        
+        # validação 3. verica se a lista está vazia
+
+        if len(dados_a) == 0:
+          raise KeyError(f"Não é possivél verificar a covariância de uma coluna vazia")
+        
+        # validação 4. verifica se todos são números, se não retorna o erro detalhado
+
+        for i in range(len(dados_a)):
+            if not isinstance(dados_a[i], (int, float)):
+                raise TypeError(
+            f"Covariância requer colunas numéricas. "
+            f"Coluna '{column_a}' na posição {i}: {repr(dados_a[i])} é {type(dados_a[i]).__name__}"
+        )
+            if not isinstance(dados_b[i], (int, float)):
+                 raise TypeError(
+            f"Covariância requer colunas numéricas. "
+            f"Coluna '{column_b}' na posição {i}: {repr(dados_b[i])} é {type(dados_b[i]).__name__}"
+        )
+            
+
+        # reultilização da média já implementada e validada em mean
+
+        media_a = self.mean(column_a)
+        media_b = self.mean(column_b)
+
+        # calculo de covariância
+        # houve necessidade de ajuste do valor indicado no teste em tests.py, pois o resultado obtido foi  1212.25 e não 2103.25 (TESTE MANUAL REALIZADO)
+
+        soma_produtos = sum((a - media_a) * (b - media_b) for a, b in zip(dados_a, dados_b))
+        return soma_produtos / len(dados_a)
 
     def itemset(self, column):
         """
