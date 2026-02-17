@@ -40,7 +40,7 @@ class Statistics:
 
         """Média - só para colunas numéricas"""
 
-        # validação 1. especifica para a mean(verificar se a coluna existe no dataset)
+        # validação 1. verificar se a coluna existe no dataset
 
         if column not in self.dataset:
             raise KeyError(f"Coluna '{column}' não existe no dataset")
@@ -62,7 +62,6 @@ class Statistics:
                 )
             
         #calculo da média e realizada aqui, após as validações
-
         # sum: soma todos os dados da coluna 
         # len: soma a quantidade a quantidade que aparece
 
@@ -71,8 +70,58 @@ class Statistics:
 
     def median(self, column):
     
-        pass
+     # validação 1. verificar se a coluna existe no dataset:
 
+      if column not in self.dataset:
+            raise KeyError(f"Coluna '{column}' não existe no dataset")
+    
+      dados = self.dataset[column]
+
+      # validação 2. verica se a lista está vazia
+
+      if len(dados) == 0:
+            raise KeyError(f"Não é possivél verificar a mediana de uma coluna vazia")
+      
+
+     # ordenação com prioridade 
+
+      if column == "priority":
+        ordem = {"baixa": 1, "media": 2, "alta": 3}
+        dados_ordenados = sorted(dados, key=lambda x: ordem[x])
+
+     # ordenação para outros casos sem prioridade
+      else:
+        dados_ordenados = sorted(dados)
+
+
+      # quantidade de elementos 
+
+      total_elementos = len(dados_ordenados)
+      meio = total_elementos // 2
+
+      # caso ímpar
+
+      if total_elementos % 2 == 1:
+          return dados_ordenados[meio]
+      
+      # caso par
+
+      esquerda = dados_ordenados[meio - 1]
+      direita = dados_ordenados[meio]
+
+      # verifica se os valores são numéricos bilateralmente 
+
+      if isinstance(esquerda, (int, float)) and isinstance(direita, (int, float)):
+         
+         # para números: média dos dois
+
+         return (esquerda + direita) / 2
+      
+      else:
+          # para texto: retorna o primeiro
+
+          return esquerda
+          
     def mode(self, column):
         """
         Encontra a moda (ou modas) de uma coluna.
