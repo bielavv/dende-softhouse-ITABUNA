@@ -1,57 +1,76 @@
 class Statistics:
-    """
-    Uma classe para realizar cálculos estatísticos em um conjunto de dados.
 
-    Atributos
-    ----------
-    dataset : dict[str, list]
-        O conjunto de dados, estruturado como um dicionário onde as chaves
-        são os nomes das colunas e os valores são listas com os dados.
-    """
     def __init__(self, dataset):
-        """
-        Inicializa o objeto Statistics.
 
-        Parâmetros
-        ----------
-        dataset : dict[str, list]
-            O conjunto de dados, onde as chaves representam os nomes das
-            colunas e os valores são as listas de dados correspondentes.
-        """
+        """VALIDAÇÃO INICIAL DO DATASET(CONJUNTO DE DADOS)"""
+
+        # 1. verificar se é um dicionário
+
+        if not isinstance(dataset, dict):
+            raise TypeError("O dataset deve ser um dicionário")
+        
+        # 2. verificar se todas as chaves tem listas
+
+        for coluna, valores in dataset.items():
+            if not isinstance(valores, list):
+                raise TypeError(f"Valores da coluna '{coluna}' devem ser uma lista")
+            
+        # 3. Todas as listas tem o mesmo tamanho?
+
+        if dataset:
+            tamanhos = [len(v) for v in dataset.values()]
+            if len(set(tamanhos)) > 1:
+                raise ValueError("Todos as caolunas devem ter o mesmo número de elementos")
+            
+        # 4. cada coluna tem dados do mesmo tipo?
+
+        for coluna, valores in dataset.items(): # esse loop aninhado vai percorrer colunas distinta do dataset.items e validar o tipo igual
+            if valores:
+                primeiro_tipo = type(valores[0])
+                for valor in valores:
+                    if type(valor) != primeiro_tipo:
+                         raise TypeError(f"coluna '{coluna}' tem tipos misturados")
+
+
+            # caso ele passe por todas as validações, vai ficar armazenado aqui para ultilizações futuras.
+    
         self.dataset = dataset
 
     def mean(self, column):
-        """
-        Calcula a média aritmética de uma coluna.
 
-        Parâmetros
-        ----------
-        column : str
-            O nome da coluna (chave do dicionário do dataset).
+        """Média - só para colunas numéricas"""
 
-        Retorno
-        -------
-        float
-            A média dos valores na coluna.
-        """
-        pass
+        # validação 1. especifica para a mean(verificar se a coluna existe no dataset)
+
+        if column not in self.dataset:
+            raise KeyError(f"Coluna '{column}' não existe no dataset")
+        
+        dados = self.dataset[column]
+
+        # validação 2. verica se a lista está vazia
+
+        if len(dados) == 0:
+            raise KeyError(f"Não é possivél calcular média de uma coluna vazia")
+        
+        # validação 3. verifica se todos são números, se não for mostra detalhes
+
+        for i, valor in enumerate(dados):
+            if not isinstance(valor, (int, float)):
+                raise TypeError(
+                    f" Média só pode ser calculada em colunas numéricas. "
+                    f"Coluna '{column}' na posição {i}: {repr(valor)} é {type(valor).__name__}"
+                )
+            
+        #calculo da média e realizada aqui, após as validações
+
+        # sum: soma todos os dados da coluna 
+        # len: soma a quantidade a quantidade que aparece
+
+        return sum(dados) / len(dados)
+    
 
     def median(self, column):
-        """
-        Calcula a mediana de uma coluna.
-
-        A mediana é o valor central de um conjunto de dados ordenado.
-
-        Parâmetros
-        ----------
-        column : str
-            O nome da coluna (chave do dicionário do dataset).
-
-        Retorno
-        -------
-        float
-            O valor da mediana da coluna.
-        """
+    
         pass
 
     def mode(self, column):
