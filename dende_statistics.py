@@ -353,27 +353,33 @@ class Statistics:
 
     def conditional_probability(self, column, value1, value2):
         """
-        Calcula a probabilidade condicional P(X_i = value1 | X_{i-1} = value2).
-
-        Este método trata a coluna como uma sequência e calcula a probabilidade
-        de encontrar `value1` imediatamente após `value2`.
-
-        Fórmula: P(A|B) = Contagem de sequências (B, A) / Contagem total de B
-
-        Parâmetros
-        ----------
-        column : str
-            O nome da coluna (chave do dicionário do dataset).
-        value1 : any
-            O valor do evento consequente (A).
-        value2 : any
-            O valor do evento condicionante (B).
-
-        Retorno
-        -------
-        float
-            A probabilidade condicional, um valor entre 0 e 1.
+        Calcula P(A|B): Probabilidade de encontrar value1 logo após value2.
         """
+        # 1. Validação de existência da coluna
+        if column not in self.dataset:
+            raise KeyError(f"Coluna '{column}' não existe no dataset")
+        
+        dados = self.dataset[column]
+        
+        # 2. Contadores
+        contagem_b = 0      # Quantas vezes o 'value2' aparece como condicionante
+        contagem_b_a = 0    # Quantas vezes a sequência (value2, value1) ocorre
+        
+        # 3. Varredura da sequência
+        # Usamos len(dados) - 1 para não tentar acessar um elemento fora da lista no último item
+        for i in range(len(dados) - 1):
+            if dados[i] == value2:
+                contagem_b += 1  # Encontramos o evento B (condicionante)
+                
+                # Verifica se o próximo elemento (i + 1) é o evento A (consequente)
+                if dados[i + 1] == value1:
+                    contagem_b_a += 1
+        
+        # 4. Cálculo final (P(A|B) = N(B,A) / N(B))
+        if contagem_b == 0:
+            return 0.0  # Evita divisão por zero se o valor2 nunca ocorrer
+            
+        return contagem_b_a / contagem_b
         pass
 
     def quartiles(self, column):
