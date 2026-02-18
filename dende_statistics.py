@@ -212,7 +212,7 @@ class Statistics:
     # houve necessidade de ajuste do valor indicado no teste em tests.py, pois o resultado obtido foi 22.918333 e não 22.527756.
 
       variancia = self.variance(column)
-      return variancia ** 0.5
+      return round(variancia ** 0.5, 6) # arredondando
 
     def covariance(self, column_a, column_b):
 
@@ -263,35 +263,40 @@ class Statistics:
         return soma_produtos / len(dados_a)
 
     def itemset(self, column):
-        """
-        Retorna o conjunto de itens únicos em uma coluna.
 
-        Parâmetros
-        ----------
-        column : str
-            O nome da coluna (chave do dicionário do dataset).
+        # validação 1. verifica se as colunas existem.
 
-        Retorno
-        -------
-        set
-            Um conjunto com os valores únicos da coluna.
-        """
-        pass
+        if column not in self.dataset:
+          raise KeyError(f"Coluna '{column}' não existe no dataset")
+        
+        dados = self.dataset[column]
+
+        # filtra itens repetidos
+
+        conjunto_unico = set(dados)
+
+        return conjunto_unico
 
     def absolute_frequency(self, column):
-        """
-        Calcula a frequência absoluta de cada item em uma coluna.
-        """
-        # 1. Validação: verifica se a coluna existe
+
+        # validação 1. verifica se a coluna existe
+
         if column not in self.dataset:
             raise KeyError(f"Coluna '{column}' não existe no dataset")
 
         dados = self.dataset[column]
-        
-        # 2. Dicionário para armazenar a contagem
+
+        # validação 2. verica se a lista está vazia
+
+        if len(dados) == 0:
+          raise KeyError(f"Não é possivél verificar a frequencia absoluta de uma coluna vazia")
+
+        # armazena contagem das frequeências
+
         frequencias = {}
 
-        # 3. Laço de repetição para contagem manual
+        # loop para contar as frequeências
+
         for item in dados:
             if item in frequencias:
                 frequencias[item] += 1
@@ -299,32 +304,29 @@ class Statistics:
                 frequencias[item] = 1
 
         return frequencias
-        pass
 
     def relative_frequency(self, column):
-        """
-        Calcula a frequência relativa (proporção) de cada item.
-        """
-        # 1. Obtém as contagens absolutas usando o método que já criamos
+        
+        # obtém as contagens absolutas usando o método que já criamos
+
         abs_freq = self.absolute_frequency(column)
         
-        # 2. Total de elementos na coluna para o cálculo da proporção
+        # total de elementos na coluna para o cálculo da proporção
+
         total_elementos = len(self.dataset[column])
         
-        # 3. Cria o dicionário de frequências relativas
+        # cria o dicionário de frequências relativas
+
         rel_freq = {}
         for item, contagem in abs_freq.items():
             rel_freq[item] = contagem / total_elementos
             
         return rel_freq
-        pass
 
     def cumulative_frequency(self, column, frequency_method='absolute'):
-        """
-        Calcula a frequência acumulada (soma sucessiva).
-        Pode ser baseada na frequência 'absolute' ou 'relative'.
-        """
-        # 1. Determina qual base de dados usar (Absoluta ou Relativa)
+        
+        # Determina qual base de dados usar (Absoluta ou Relativa)
+
         if frequency_method == 'relative':
             base_freq = self.relative_frequency(column)
         else:
@@ -332,24 +334,28 @@ class Statistics:
 
         # 2. Ordenação das chaves
         # Para o dataset do Spotify/Teste, se for 'priority', usamos a ordem lógica
+
         if column == "priority":
             ordem_manual = {"baixa": 1, "media": 2, "alta": 3}
             itens_ordenados = sorted(base_freq.keys(), key=lambda x: ordem_manual.get(x, 0))
         else:
             # Para outras colunas, usa ordem alfabética ou numérica padrão
+
             itens_ordenados = sorted(base_freq.keys())
 
         # 3. Cálculo do acúmulo
+
         acumulada = {}
         soma_atual = 0
         
         for item in itens_ordenados:
             soma_atual += base_freq[item]
+
             # Arredondamos para evitar erros de precisão decimal em frequências relativas
+
             acumulada[item] = round(soma_atual, 4) if frequency_method == 'relative' else soma_atual
 
         return acumulada
-        pass
 
     def conditional_probability(self, column, value1, value2):
         """
