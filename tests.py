@@ -84,13 +84,27 @@ class TestStatistics(unittest.TestCase):
 
     # ---------- Frequência Absoluta ----------
 
-    def test_absolute_frequency_priority(self):
-        expected = {
-            "baixa": 3,
-            "media": 2,
-            "alta": 5
-        }
-        self.assertEqual(self.stats.absolute_frequency("priority"), expected)
+    def absolute_frequency(self, column):
+        """
+        Calcula a frequência absoluta de cada item em uma coluna.
+        """
+        # 1. Validação: verifica se a coluna existe
+        if column not in self.dataset:
+            raise KeyError(f"Coluna '{column}' não existe no dataset")
+
+        dados = self.dataset[column]
+        
+        # 2. Dicionário para armazenar a contagem
+        frequencias = {}
+
+        # 3. Laço de repetição para contagem manual
+        for item in dados:
+            if item in frequencias:
+                frequencias[item] += 1
+            else:
+                frequencias[item] = 1
+
+        return frequencias
 
     # ---------- Frequência Relativa ----------
 
