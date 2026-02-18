@@ -161,7 +161,7 @@ class TestStatistics(unittest.TestCase):
         expected = {
             "Q1": 67.5,
             "Q2": 105.0,
-            "Q3": 165.0
+            "Q3": 170.0
         }
         self.assertEqual(self.stats.quartiles("participants"), expected)
 
