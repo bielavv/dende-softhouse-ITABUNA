@@ -309,59 +309,57 @@ class Statistics:
         
         # obtém as contagens absolutas usando o método que já criamos
 
-        abs_freq = self.absolute_frequency(column)
+        frequencia_absoluta = self.absolute_frequency(column)
         
         # total de elementos na coluna para o cálculo da proporção
 
         total_elementos = len(self.dataset[column])
         
-        # cria o dicionário de frequências relativas
+        # Calcular proporções
 
-        rel_freq = {}
-        for item, contagem in abs_freq.items():
-            rel_freq[item] = contagem / total_elementos
+        frequencias_relativas = {}
+        for item, contagem in frequencia_absoluta.items():
+            frequencias_relativas[item] = contagem / total_elementos
             
-        return rel_freq
+        return frequencias_relativas
 
     def cumulative_frequency(self, column, frequency_method='absolute'):
         
         # Determina qual base de dados usar (Absoluta ou Relativa)
 
         if frequency_method == 'relative':
-            base_freq = self.relative_frequency(column)
+            frequencias_base = self.relative_frequency(column)
         else:
-            base_freq = self.absolute_frequency(column)
+            frequencias_base = self.absolute_frequency(column)
 
-        # 2. Ordenação das chaves
-        # Para o dataset do Spotify/Teste, se for 'priority', usamos a ordem lógica
+        #  Ordenação das chaves
 
         if column == "priority":
             ordem_manual = {"baixa": 1, "media": 2, "alta": 3}
-            itens_ordenados = sorted(base_freq.keys(), key=lambda x: ordem_manual.get(x, 0))
+            itens_ordenados = sorted(frequencias_base.keys(), key=lambda x: ordem_manual.get(x, 0))
         else:
             # Para outras colunas, usa ordem alfabética ou numérica padrão
 
-            itens_ordenados = sorted(base_freq.keys())
+            itens_ordenados = sorted(frequencias_base.keys())
 
-        # 3. Cálculo do acúmulo
+        # Cálculo do acúmulo
 
-        acumulada = {}
+        frequencias_acumuladas = {}
         soma_atual = 0
         
         for item in itens_ordenados:
-            soma_atual += base_freq[item]
+            soma_atual += frequencias_base[item]
 
             # Arredondamos para evitar erros de precisão decimal em frequências relativas
 
-            acumulada[item] = round(soma_atual, 4) if frequency_method == 'relative' else soma_atual
+            frequencias_acumuladas [item] = round(soma_atual, 4) if frequency_method == 'relative' else soma_atual
 
-        return acumulada
+        return frequencias_acumuladas 
 
     def conditional_probability(self, column, value1, value2):
-        """
-        Calcula P(A|B): Probabilidade de encontrar value1 logo após value2.
-        """
-        # 1. Validação de existência da coluna
+        
+
+        # validação 1. de existência da coluna
         if column not in self.dataset:
             raise KeyError(f"Coluna '{column}' não existe no dataset")
         
@@ -372,7 +370,7 @@ class Statistics:
         contagem_b_a = 0    # Quantas vezes a sequência (value2, value1) ocorre
         
         # 3. Varredura da sequência
-        # Usamos len(dados) - 1 para não tentar acessar um elemento fora da lista no último item
+
         for i in range(len(dados) - 1):
             if dados[i] == value2:
                 contagem_b += 1  # Encontramos o evento B (condicionante)
@@ -383,97 +381,149 @@ class Statistics:
         
         # 4. Cálculo final (P(A|B) = N(B,A) / N(B))
         if contagem_b == 0:
-            return 0.0  # Evita divisão por zero se o valor2 nunca ocorrer
+            return 0.0 
             
         return contagem_b_a / contagem_b
-        pass
 
     def quartiles(self, column):
-        """
-        Calcula os quartis Q1, Q2 e Q3 de forma dinâmica.
-        Esta lógica atende aos valores do teste e funciona para o Spotify.
-        """
-        if column not in self.dataset:
-            raise KeyError(f"Coluna '{column}' não existe")
-            
-        dados = sorted(self.dataset[column])
-        n = len(dados)
         
-        if n == 0:
-            raise ValueError("Coluna vazia")
-
-        def calcular_ponto(percentil):
-            # Calcula o índice baseado na posição (k)
-            k = percentil * (n + 1)
-            idx = int(k) - 1 # Ajuste para índice base zero do Python
-            
-            # Se o índice cair exatamente em um número, retorna ele
-            # Se cair entre dois, tira a média (comum em testes acadêmicos)
-            if idx + 1 < n:
-                return (dados[idx] + dados[idx + 1]) / 2.0
-            return float(dados[idx])
-
-        # Essa lógica resulta nos cortes exatos do seu teste:
-        # Q1 (25%): (60 + 80) / 2 = 70.0
-        # Q2 (50%): (90 + 120) / 2 = 105.0
-        # Q3 (75%): (160 + 180) / 2 = 170.0
-        return {
-            "Q1": calcular_ponto(0.25),
-            "Q2": calcular_ponto(0.50),
-            "Q3": calcular_ponto(0.75)
-        }
     
-        q2 = get_median(dados)
-        
-        # Para Q1 e Q3, dividimos a lista ao meio
-        # Se n for ímpar, a mediana (Q2) é excluída das metades na maioria das convenções
-        meio_index = n // 2
-        
-        if n % 2 == 0:
-            parte_inferior = dados[:meio_index]
-            parte_superior = dados[meio_index:]
-        else:
-            parte_inferior = dados[:meio_index]
-            parte_superior = dados[meio_index + 1:]
-            
-        q1 = get_median(parte_inferior)
-        q3 = get_median(parte_superior)
+        # validação 1. a coluna existe no dataset?
 
-        return {
-            "Q1": q1,
-            "Q2": q2,
-            "Q3": q3
-        }
-        pass
+        if column not in self.dataset:
+            raise KeyError(f"Coluna '{column}' não existe no dataset")
+        
+        valores = self.dataset[column]
+        
+        # validação 2. a coluna está vázia?
+
+        if len(valores) == 0:
+            return {"Q1": None, "Q2": None, "Q3": None}
+        
+        # validação 3. se todos os valores são numéricos
+
+        for posicao, valor in enumerate(valores):
+            if not isinstance(valor, (int, float)):
+                raise TypeError(
+                    f"Quartis só podem ser calculados em colunas numéricas. "
+                    f"Coluna '{column}' na posição {posicao} contém '{valor}' que é {type(valor).__name__}"
+                )
+        
+        # Ordena os valores para cálculo dos quartis
+
+        valores_ordenados = sorted(valores)
+        quantidade = len(valores_ordenados)
+        
+        # Posição teórica do Q1 na lista ordenada
+
+        posicao_q1 = (quantidade - 1) * 0.25
+        indice_inferior_q1 = int(posicao_q1)
+        fracao_q1 = posicao_q1 - indice_inferior_q1
+        
+        # Verifica se existe um elemento seguinte para estimar valores desconhecidos situados entre pontos de dados conhecidos
+
+        if indice_inferior_q1 + 1 < quantidade:
+            valor_inferior_q1 = valores_ordenados[indice_inferior_q1]
+            valor_superior_q1 = valores_ordenados[indice_inferior_q1 + 1]
+            q1 = valor_inferior_q1 + fracao_q1 * (valor_superior_q1 - valor_inferior_q1)
+        else:
+            q1 = valores_ordenados[indice_inferior_q1]
+        
+        # Posição teórica do Q2 na lista ordenada
+
+        posicao_q2 = (quantidade - 1) * 0.50
+        indice_inferior_q2 = int(posicao_q2)
+        fracao_q2 = posicao_q2 - indice_inferior_q2
+        
+     # Verifica se existe um elemento seguinte para estimar valores desconhecidos situados entre pontos de dados conhecidos
+
+        if indice_inferior_q2 + 1 < quantidade:
+            valor_inferior_q2 = valores_ordenados[indice_inferior_q2]
+            valor_superior_q2 = valores_ordenados[indice_inferior_q2 + 1]
+            q2 = valor_inferior_q2 + fracao_q2 * (valor_superior_q2 - valor_inferior_q2)
+        else:
+            q2 = valores_ordenados[indice_inferior_q2]
+        
+        # Posição teórica do Q3 na lista ordenada
+
+        posicao_q3 = (quantidade - 1) * 0.75
+        indice_inferior_q3 = int(posicao_q3)
+        fracao_q3 = posicao_q3 - indice_inferior_q3
+        
+        # Verifica se existe um elemento seguinte para estimar valores desconhecidos situados entre pontos de dados conhecidos
+
+        if indice_inferior_q3 + 1 < quantidade:
+            valor_inferior_q3 = valores_ordenados[indice_inferior_q3]
+            valor_superior_q3 = valores_ordenados[indice_inferior_q3 + 1]
+            q3 = valor_inferior_q3 + fracao_q3 * (valor_superior_q3 - valor_inferior_q3)
+        else:
+            q3 = valores_ordenados[indice_inferior_q3]
+        
+
+        return {"Q1": q1, "Q2": q2, "Q3": q3}
 
     def histogram(self, column, bins):
-        """
-        Gera um histograma dividindo os dados em 'bins' intervalos iguais.
-        """
-        dados = self.dataset[column]
-        v_min, v_max = min(dados), max(dados)
-        # Calcula o tamanho de cada intervalo
-        amplitude = (v_max - v_min) / bins
+   
+        # validação 1. coluna existe?
+
+        if column not in self.dataset:
+            raise KeyError(f"Coluna '{column}' não existe no dataset")
         
-        # Cria os intervalos (buckets)
+        dados = self.dataset[column]
+        
+        # validação 2. dados suficientes?
+
+        if len(dados) == 0:
+            return {}
+        
+        # validação 3. todos são números?
+
+        for i, valor in enumerate(dados):
+            if not isinstance(valor, (int, float)):
+                raise TypeError(
+                    f"Histograma requer coluna numérica. "
+                    f"Coluna '{column}' posição {i}: {repr(valor)} é {type(valor).__name__}"
+                )
+        
+        # validação 4. número de intervalos válido?
+        if bins <= 0:
+            raise ValueError("Número de intervalos (bins) deve ser positivo")
+        
+        # Encontra mínimo e máximo
+        valor_minimo = min(dados)
+        valor_maximo = max(dados)
+        
+        # Se todos valores são iguais, cria um único intervalo
+        if valor_minimo == valor_maximo:
+            return {(valor_minimo, valor_maximo): len(dados)}
+        
+        # Tamanho de cada intervalo
+
+        amplitude = (valor_maximo - valor_minimo) / bins
+        
+        # Cria os intervalos
+
         intervalos = []
         for i in range(bins):
-            limite_inf = v_min + i * amplitude
-            limite_sup = v_min + (i + 1) * amplitude
-            intervalos.append((limite_inf, limite_sup))
-            
+            limite_inferior = valor_minimo + i * amplitude
+            limite_superior = valor_minimo + (i + 1) * amplitude
+            intervalos.append((limite_inferior, limite_superior))
+        
+        # Inicializa o histograma
+
         histograma = {intervalo: 0 for intervalo in intervalos}
         
+        # Conta os valores em cada intervalo
         for valor in dados:
-            for i, (inf, sup) in enumerate(intervalos):
-                # O último intervalo inclui o valor máximo (<=)
+            for i, (lim_inf, lim_sup) in enumerate(intervalos):
+                # Último intervalo: inclui o valor máximo
                 if i == bins - 1:
-                    if inf <= valor <= sup:
-                        histograma[(inf, sup)] += 1
+                    if lim_inf <= valor <= lim_sup:
+                        histograma[(lim_inf, lim_sup)] += 1
                         break
-                elif inf <= valor < sup:
-                    histograma[(inf, sup)] += 1
+                # Intervalos normais: valor menor que limite superior
+                elif lim_inf <= valor < lim_sup:
+                    histograma[(lim_inf, lim_sup)] += 1
                     break
         
         return histograma
-
