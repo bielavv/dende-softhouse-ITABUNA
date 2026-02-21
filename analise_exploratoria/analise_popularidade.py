@@ -182,7 +182,7 @@ def analisar_popularidade(stats, dados):
     
     # Música mais popular
 
-    idx_top = indices_top[0] if 'indices_top' in locals() else 0
+    idx_top = indices[0]
     print(f"• Música mais popular: '{dados['track_name'][idx_top]}' - {dados['artist_name'][idx_top]}")
     
     return {

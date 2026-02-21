@@ -145,7 +145,7 @@ def analisar_explicit(stats, dados):
     
     # 6. TOP MÚSICAS NÃO EXPLÍCITAS
 
-    print("\n🏆 TOP 10 MÚSICAS NÃO EXPLÍCITAS MAIS POPULARES:")
+    print("\nTOP 10 MÚSICAS NÃO EXPLÍCITAS MAIS POPULARES:")
     print("-" * 60)
     print(f"{'#':3} {'Música':45} {'Artista':25} {'Pop':5}")
     print("-" * 60)
@@ -210,24 +210,23 @@ def analisar_explicit(stats, dados):
         print(f"{i:3} {artista[:45]:45} : {total} músicas (nenhuma explícita)")
     
 def main():
-    """Função principal que executa a análise"""
     
     print("=" * 60)
-    print("🔞 ANÁLISE DE CONTEÚDO EXPLÍCITO - SPOTIFY DATASET")
+    print(" ANÁLISE DE CONTEÚDO EXPLÍCITO - SPOTIFY DATASET")
     print("=" * 60)
     
     # Carregar dados
     dados, stats = carregar_dados()
     
     if not dados or not stats:
-        print("\n❌ Não foi possível carregar os dados.")
+        print("\n Não foi possível carregar os dados.")
         return
     
     # Executar análise
     resultados = analisar_explicit(stats, dados)
     
     print("\n" + "=" * 60)
-    print("✅ ANÁLISE DE CONTEÚDO EXPLÍCITO CONCLUÍDA!")
+    print(" ANÁLISE DE CONTEÚDO EXPLÍCITO CONCLUÍDA!")
     print("=" * 60)
 
 # Permite executar este arquivo diretamente

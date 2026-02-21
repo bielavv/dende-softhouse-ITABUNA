@@ -20,7 +20,7 @@ class Statistics:
         if dataset:
             tamanhos = [len(v) for v in dataset.values()]
             if len(set(tamanhos)) > 1:
-                raise ValueError("Todos as colunas devem ter o mesmo número de elementos")
+                raise ValueError("Todas as colunas devem ter o mesmo número de elementos")
             
         # 4. cada coluna tem dados do mesmo tipo?
 
